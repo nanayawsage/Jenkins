@@ -1,0 +1,146 @@
+New! Keyboard shortcuts … Drive keyboard shortcuts have been updated to give you first-letters navigation
+################################################################################################################################
+
+Jenkins:
+  - Jenkins is an open-source automation server that enables continuous integration and continuous delivery/deployment (CI/CD), 
+  automating the various stages of software development such as test, build, and deployment of artifacts. It allows developers to
+  automate the entire software development lifecycle from integrating, building, testing and deployment of deployable artifacts.
+  It is a cross-platform automation tool written in Java and It is used to implement CI/CD workflows, called pipelines
+
+Brief History on Jenkins:
+  - The Jenkins project was started in 2004 (originally called Hudson) by Kohsuke Kawaguchi, while he worked for the 
+  Sun Microsystems. Hudson was renamed to Jenkins due to copyright issues between Oracle and The Hudson Community.
+
+  - 2004 to 2011 === Hudson
+  - 2011 to date === Jenkins
+
+CI/CD (Continuous Integration(CI) and Continuous Delivery/Deployment(CD)):
+  - These are key practices in modern software development that aim to automate and streamline the process of building, testing, 
+  and deploying software
+
+  - Continuous Integration (CI): Continuous Integration is the practice of frequently integrating code changes from multiple 
+  developers into a shared repository, typically several times a day. With CI, each code change triggers an automated build 
+  process that compiles the code, runs automated tests, and produces a deployable artifact (e.g., executable, package). 
+  This is to detect integration errors early, ensure that the codebase remains in a deployable state at all times, and 
+  provide fast feedback to developers
+
+  - Continuous Delivery (CD): Continuous Delivery is the practice of automating the process of deploying code changes to 
+  production or other environments in a reliable and repeatable manner. In a Continuous Delivery pipeline, code changes that 
+  pass through the CI process are automatically deployed to one or more pre-production environments (e.g., staging, testing) 
+  for further testing and validation
+
+  - Continuous Deployment (CD): Continuous Deployment is an extension of Continuous Delivery that goes a step further by 
+  automatically deploying every code change that passes through the CI process directly to production. 
+  With Continuous Deployment, there is no manual intervention required to release changes to production, as the deployment 
+  process is fully automated and triggered by successful builds.
+
+The CI/CD Process:
+  - Continuous Integration: (Planning, Coding, Building, Testing)
+  - Continuous Delivery/Deployment: (Release, Deploy, Operate, Monitoring)
+
+Other CI/CD Tools:
+  - Gitlab CI/CD
+  - GitHub Actions
+  - Azure DevOps
+  - Travis CI
+  - Circle CI
+  - AWS Code Pipeline
+
+Environments for Software Development:
+  - Sandbox environment
+  - Development/Dev environment
+  - Testing/Test environment/env
+  - Staging environment
+  - Production/Prod environment
+  - Maintenance environment
+
+Continuous Delivery:
+Plan ---- Code --- Build ----  Test  ----  UAT  --- Staging Env --- Manual Approval(Project Manager)  ---  Prod Env(Live)
+
+Continuous Deployment:
+Plan ---- Code --- Build ----  Test ----  UAT  --- Staging Env --- Automatic Approval  ---  Prod Env(Live)
+
+
+Jenkins Installation Steps on Ubuntu:
+NB: t2.medium ec2 instance
+
+# Changing The Hostname of The EC2 
+sudo hostnamectl set-hostname jenkins
+sudo su - ubuntu
+
+# Update and Upgrade the Ubuntu EC2
+sudo apt update -y
+sudo apt upgrade -y
+
+# Installation and Verification of Java
+sudo apt install fontconfig openjdk-17-jre -y
+java -version
+
+# Installation of Jenkins 
+# 1. acquire the key to authenticate the packages inside of the jenkins repo.
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+# 2. Add the jenkins repository URL to a new file named jenkins.list, specifies every package has to be signed with the key above, then tee writes to jenkins.list and the terminal(whose output is suppressed)
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update -y
+sudo apt-get install jenkins -y
+
+# Start and EnableJenkins
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+
+# Verify Status of Jenkins
+sudo systemctl status jenkins
+
+After initially installing jenkins and running systemctl status, the default Admin password is provided on the terminal. It can be cat too.
+
+By default, Jenkins runs on port 8080
+
+To get the initial administrator password, run:
+  - sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+
+Plugins Installation:
+  - Jenkins depends on a lot of them to function: Sonarqube scanner, nexus artifact uploader, deploy to EAR, deploy to container - to equip jenkins with additional features.
+  - Install suggested plugins
+Create First Admin User:
+  - username
+  - password
+  - confirm password
+  - full name
+  - email address
+
+Installing Maven as a build tool in Jenkins:
+  - Manage Jenkins
+  - Tools (Under System Configuration)
+  - Maven installations
+    - enter name # prefered name
+    - version # 3.9.6
+  - apply and save
+
+# creating new job on jenkins:
+* dashboard
+  - new item
+  - enter item name
+  - save
+
+* description # give a description to your project
+
+* source code management
+  - git # copy and paste the git url of your project
+  - credential # enter your github credentials if your project repo is private 
+  - branch # main or the name of your branch
+
+* Build Steps
+  - Invoke top-level Maven targets
+    - Maven Version # select your maven version
+    - Goals # enter any Maven goal
+
+  - Apply and save
+
+* On your project/job dashboard, click:
+  - Build Now
+
+- It's good to configure a web pull so that jenkins scans for changes periodically and triggers a build.
+- A target folder is created inside the directory containing the pom.xml after running the maven goals. You can also view the jenkins server directories in the jenkins gui under workspace
